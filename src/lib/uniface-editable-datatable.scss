@@ -1,0 +1,244 @@
+:root {
+  --uniface-editor-table-inside-border-color: #e1e1e1;
+}
+
+.uniface-editable-data-table {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  color: var(--uniface-default-text-color, #374151);
+  background: var(--uniface-data-table-bg, #ffffff);
+  overflow: hidden;
+
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    box-sizing: border-box;
+    width: 8px;
+    height: 8px;
+
+    &:vertical {
+      border-left: 1px solid var(--uniface-inner-border-color, #d9d9d9);
+    }
+
+    &:horizontal {
+      border-top: 1px solid var(--uniface-inner-border-color, #d9d9d9);
+    }
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: #e1e1e1;
+    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+  }
+
+  /*
+   * 整个表格分成两个区域，左边的固定区域和右边的数据区域
+   */
+  & > div {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .table-row {
+    height: 38px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    box-sizing: border-box;
+    position: relative;
+    flex-wrap: nowrap;
+    background-color: var(--uniface-data-table-bg, #ffffff);
+
+    &.alternative {
+      background-color: var(--uniface-data-table-alter-row-bg, #f7f7f7);
+    }
+  }
+
+  .indicator-panel {
+    height: 100%;
+    width: 90px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+
+    .header-row {
+      box-sizing: border-box;
+      border-right: 1px solid var(--uniface-editor-table-inside-border-color, #e1e1e1);
+    }
+
+    .indicator-header {
+      flex: 0 0 auto;
+      overflow: hidden;
+
+    }
+
+    .indicator-rows-wrapper {
+      flex: 1 1 auto;
+      overflow: hidden;
+
+      & > div {
+        width: 100%;
+        position: relative;
+        box-sizing: border-box;
+      }
+    }
+
+    .table-row {
+
+      border-right: 1px solid var(--uniface-editor-table-inside-border-color, #e1e1e1);
+      gap: 6px;
+      padding: 0 8px;
+
+      .action-icon {
+        visibility: hidden;
+        padding: 4px;
+        color: #FFFFFF;
+        background-color: var(--uniface-navigator-menu-hover-background-color, #90CAF9);
+        border-radius: 4px;
+
+        &:active {
+          position: relative;
+          top: 1px;
+        }
+      }
+
+      &:hover {
+        .action-icon {
+          visibility: visible;
+        }
+      }
+    }
+
+    .bottom-mask {
+      width: 100%;
+      height: 8px;
+      box-sizing: border-box;
+      background-color: #ffffff;
+      border-top: 1px solid var(--uniface-inner-border-color, #d9d9d9);
+
+    }
+  }
+
+  .header-row {
+    position: relative;
+    width: 100%;
+    background-color: var(--uniface-data-table-header-bg, #F8FAFC);
+    flex: 0 0 auto;
+    height: var(--uniface-data-table-header-hight, 48px);
+    overflow: hidden;
+    font-weight: 600;
+    user-select: none;
+    color: var(--uniface-data-table-header-color, #374151);
+
+    .resizer {
+      width: 5px;
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background-repeat: no-repeat;
+      background-position-y: center;
+      background-position-x: right;
+      cursor: ew-resize;
+      background-size: contain;
+      display: none;
+    }
+
+
+
+    //可滚动的数据列
+    .cells-wrapper {
+      display: flex;
+      height: 100%;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      position: relative;
+      box-sizing: border-box;
+      align-items: center;
+
+      .header-cell {
+        height: 100%;
+        flex: 0 0 auto;
+        position: relative;
+        box-sizing: border-box;
+        border-right: 1px solid var(--uniface-primary-border-color, #E2E8F0);
+
+        &>div:first-child {
+          position: relative;
+          top: 50%;
+          transform: translateY(-50%);
+          text-align: center;
+        }
+
+        &:hover {
+          .resizer {
+            display: block;
+          }
+        }
+
+      }
+
+      &.resizing {
+
+      }
+    }
+
+  }
+
+  //内容区域，也是分为3个部分
+  .data-content-panel {
+    position: relative;
+    width: 100%;
+    flex: 1 1 auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+
+    .data-view-panel {
+      flex: 1 1 auto;
+      overflow: auto;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .table-row {
+      .data-cell {
+        position: relative;
+        flex: 0 0 auto;
+        height: 100%;
+        box-sizing: border-box;
+        border-right: 1px solid var(--uniface-editor-table-inside-border-color, #e1e1e1);
+
+        &.active {
+          border: 1px solid blue; /* 获取焦点时的边框 */
+        }
+
+        &:focus {
+          outline: none; /* 可选：移除默认的 outline */
+        }
+
+      }
+
+      .editor-cell {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+    }
+  }
+
+  .bottom-border {
+    .table-row {
+      &:last-child {
+        border-bottom: 1px solid var(--uniface-editor-table-inside-border-color, #e1e1e1);
+      }
+    }
+  }
+}
