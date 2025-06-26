@@ -4,41 +4,38 @@ const columns: Array<DataColumn> =
     [
         {
             text: "姓名",
+            field: "name",
             width: 130,
             resizable: true,
             type: "text",
-            props: {
-                field: "name"
-            }
+            attrs: {}
         },
         {
             text: "性别",
+            field: "gender",
             width: 120,
             type: "options-selector",
             props: {
-                field: "gender",
                 options: [
                     {code: "M", text: "男性"},
                     {code: "F", text: "女性"}
-                ]
-            }
+                ],
+                mandatory: true
+            },
         },
         {
             text: "家庭地址",
+            field: "address",
             width: 360,
-            type: "text",
             resizable: true,
-            props: {
-                field: "address"
-            }
         },
         {
             text: "航司",
+            field: "airline",
             width: 360,
             type: "multi-select",
             resizable: true,
             props: {
-                field: "airline",
                 options: [
                     {code: "CN", text: "国行"},
                     {code: "CZ", text: "南航"},
@@ -49,52 +46,52 @@ const columns: Array<DataColumn> =
         },
         {
             text: "联系电话",
+            field: "telphone",
             width: 120,
             type: "text",
             resizable: true,
             props: {
-                field: "phoneNumber"
+                input$maxLength: 20
             }
         },
         {
             text: "联系人",
+            field: "concat",
             width: 120,
             type: "text",
             props: {
-                field: "concatPerson"
+                input$maxLength: 40
             }
         },
         {
             text: "总费用",
+            field: "totalFee",
             width: 120,
             type: "number",
             props: {
-                field: "totalFee"
+                precision: 2
             }
         },
         {
             text: "以结算",
+            field: "settle",
             width: 120,
             type: "boolean",
-            props: {
-                field: "settle"
-            }
+            props: {}
         },
         {
             text: "入院日期",
+            field: "enrollDate",
             width: 120,
             type: "date",
-            props: {
-                field: "enrollDate"
-            }
+            props: {}
         },
         {
             text: "出院日期",
+            field: "dischargeDate",
             width: 240,
             type: "date-time",
-            props: {
-                field: "dischargeDate"
-            }
+            props: {}
         }
     ]
 

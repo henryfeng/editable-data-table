@@ -2,54 +2,55 @@
 
 
     import type DataColumn from "$lib/lib/DataColumn";
-    import editorManager from "$lib/components/EditorManager";
-    import i18n from "@ticatec/uniface-element/I18nContext";
+    import {editorManager} from "@ticatec/uniface-element/InlineCellEditor";
+    import TextCell from "./TextCell.svelte";
 
     export let rowIdx: number;
     export let colIdx: number;
     export let column: DataColumn;
-    export let data: any;
     export let readonly: boolean;
-    export let error: string | null;
     export let activeCell: any;
+
+    export let data: any;
+    export let error: string | null;
 
     let active: boolean = false;
 
-    let inlineEditor: any = editorManager.getRender(column.type);
-
-    const handleMouseEnter = (event: MouseEvent) => {
-        if (error) {
-            //TODO show hint
-        }
-    }
-
-    const handleMouseLeave = (event: MouseEvent) => {
-        if (error) {
-
-        }
-    }
+    let inlineEditor: any = column.type && !readonly ? editorManager.getRender(column.type) : null;
 
     const setActiveCell = (value: boolean) => () => {
-        setTimeout(() => {
-            if (value) {
-                if (!active) {
-                    activeCell = {rowIdx, colIdx};
+        if (column.type && !readonly) {
+            setTimeout(() => {
+                if (value) {
+                    if (!active) {
+                        activeCell = {rowIdx, colIdx};
+                    }
+                } else {
+                    activeCell = null;
                 }
-            } else {
-                activeCell = null;
-            }
-        }, 200);
+            }, 200);
+        }
     }
 
-    const cleanError = () => {
-
+    const showHint = (e: MouseEvent) => {
+        window.Hint.show(e.target as Element, error, e.x, e.y);
     }
 
-    $: active = activeCell?.rowIdx == rowIdx && activeCell?.colIdx == colIdx;
+    $: active = activeCell != null && activeCell?.rowIdx == rowIdx && activeCell?.colIdx == colIdx;
 
-    //    on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave} on:click={setActiveCell(true)}tabindex="-1"
 </script>
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-<div class="data-cell col-{colIdx+1}" class:active on:focusin={setActiveCell(true)}>
-    <svelte:component this={inlineEditor} {readonly} {data} {column} {active}/>
+<div id="_{rowIdx}" class="data-cell col-{colIdx} {inlineEditor ? 'editor' : ''}" class:active on:focusin={setActiveCell(true)}>
+    {#if inlineEditor}
+        <svelte:component this={inlineEditor} {readonly} bind:data field={column.field} props={column.props} {active}/>
+    {:else}
+        <div class="vertical-center">
+            <TextCell {data} {column}/>
+        </div>
+    {/if}
+    {#if error}
+        <div class="warning-flag">
+            <i class="icon_google_error" aria-hidden="true" on:mouseenter={showHint}></i>
+        </div>
+    {/if}
 </div>

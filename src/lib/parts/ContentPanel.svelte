@@ -1,88 +1,100 @@
 <script lang="ts">
 
-    import TableRow from "./TableRow.svelte";
     import type DataColumn from "../lib/DataColumn";
-    import type Row from "$lib/lib/Row";
-    import TableHeader from "$lib/parts/TableHeader.svelte";
-    import utils from "$lib/lib/utils";
-    import {onMount} from "svelte";
+    import {onDestroy, onMount} from "svelte";
+    import TableHeaderPanel from "./TableHeaderPanel.svelte";
+    import  {type TableEventHandler} from "../UniDataTable";
+    import DataRow from "./DataRow.svelte";
+    import {rows} from "$lib/lib/RowsStore";
 
 
-    export let columns: Array<DataColumn>
-    export let rows: Array<Row>;
+    export let columns: Array<DataColumn>;
+    export let emptyIndicator: string | null = null;
+
+    //let width: number = 0;
+
     export let scrollTop: number = 0;
-    export let readonly: boolean;
-    export let id: string;
+    export let rowHeight: number;
+    export let activeCell: any;
+    export let showVerticalScroll: boolean = false;
+    export let displayHorizontalScroll: boolean = true;
 
-    export let hasScrollbar: boolean = false;
+    export let handleWidthChange: TableEventHandler;
 
-    let tabWidth: number = 0; //表格的事件宽度
+    export let tabWidth: number;
 
-    let activeCell: any = null;
-
-
-    let colStyle: string = '';
     let scrollLeft: number = 0;
-    let viewWidth: number; //视窗宽度
 
+    let resizeObserver: ResizeObserver;
+    let viewPanel: any;
 
-    const handleDataTableScroll = (e: UIEvent) => {
-        scrollTop = e.target?.scrollTop;
+    onMount(async () => {
+        resizeObserver = new ResizeObserver(() => {
+            // 每次 div 尺寸变化时，更新 clientWidth
+            viewWidth = Math.round(viewPanel?.clientWidth)-1;
+        });
+        resizeObserver.observe(viewPanel);
+    });
+
+    onDestroy(()=>{
+        resizeObserver.disconnect();
+    })
+
+    const handleDataTableScroll = (e: Event) => {
+        if (showVerticalScroll) {
+            scrollTop = e.target?.scrollTop;
+        }
         scrollLeft = e.target?.scrollLeft;
     }
 
-    const calculateTableWidth = () => {
-        tabWidth = 0;
-        columns.forEach((col: DataColumn) => {
-            tabWidth += col.width;
-        });
-    }
 
-    let viewPanel: any;
-
-    onMount(() => {
-        calculateTableWidth();
-        const resizeObserver = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                hasScrollbar = viewPanel.scrollHeight > viewPanel.clientHeight;
+    const handleWheelEvent = (e: WheelEvent) => {
+        let maxSh = dataPanel.scrollHeight - dataPanel.clientHeight;
+        if (!showVerticalScroll && maxSh > 0) {
+            if (e.deltaY != 0) {
+                scrollTop = scrollTop + e.deltaY;
+                if (scrollTop < 0) {
+                    scrollTop = 0;
+                }
+                if (scrollTop > maxSh) {
+                    scrollTop = maxSh;
+                }
+                setTimeout(() => {
+                    scrollTop = dataPanel.scrollTop;
+                }, 200);
             }
-        });
-        resizeObserver.observe(viewPanel);
-
-        return () => {
-            resizeObserver.disconnect();
-        };
-
-
-    });
-
-    const onColumnResize = () => {
-        calculateTableWidth();
+        }
     }
 
-    $: colStyle = utils.buildColumnStyle(id, columns);
-
-    let width: number = 0;
-
-    $: width = Math.max(viewWidth, tabWidth);
-
-    $: if (rows) {
-        activeCell = null;
+    $: if (dataPanel && scrollTop > -1 && !showVerticalScroll) {
+        dataPanel.scrollTop = scrollTop;
     }
+
+    let viewWidth: number;
+    $: rowWidth = Math.max(viewWidth, tabWidth);
+
+    let hasWhitespace: boolean = true;
+    $: hasWhitespace = viewWidth > tabWidth;
+
+
+    let top: string = "0px";
+    let dataPanel: any;
 
 </script>
-<div class="data-content-panel" bind:clientWidth={viewWidth}>
-    {@html colStyle}
-    <div class="data-view-panel" style="overflow: hidden" class:bottom-border={!hasScrollbar}>
-        <TableHeader {columns} {scrollLeft} {onColumnResize} {width}/>
-        <div bind:this={viewPanel} style="flex: 1 1 auto; overflow-y: auto; overflow-x: {tabWidth > viewWidth ? 'auto' : 'hidden'};  box-sizing: border-box; position: relative"
-             on:scroll|passive={handleDataTableScroll}>
-            <div style="width: {width}px; box-sizing: border-box;">
-                {#each rows as row, idx}
-                    <TableRow bind:activeCell rowIdx={idx} {readonly} {row} {columns} alternative={idx % 2 == 1}/>
+<div class="data-content-panel" bind:this={viewPanel}>
+    <TableHeaderPanel dataCols={columns} {scrollLeft} width={tabWidth} {hasWhitespace} {handleWidthChange}/>
+    <div class="data-view-panel" bind:this={dataPanel} on:scroll|passive={handleDataTableScroll} on:wheel|passive={handleWheelEvent}
+         style="overflow-x: {displayHorizontalScroll ? 'scroll' : 'auto'}; overflow-y: {showVerticalScroll ?'auto': 'hidden' };">
+        {#if $rows.length > 0}
+            <div style="box-sizing: border-box; width: {rowWidth}px; top: {top}">
+                {#each $rows as row, idx}
+                    <DataRow {rowHeight} {row} {columns} rowIdx={idx} alternative={idx % 2 == 1} bind:activeCell/>
                 {/each}
             </div>
-
-        </div>
+        {:else}
+            <div class="empty-content-board" style="width: 100%">
+                <div>{emptyIndicator ?? "Empty dataset."}</div>
+            </div>
+        {/if}
     </div>
 </div>

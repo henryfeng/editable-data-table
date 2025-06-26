@@ -9,6 +9,22 @@ const buildColumnStyle = (id: string, columns: Array<DataColumn>): string => {
     return `<style>${style}</style>`;
 }
 
+/**
+ * 睡眠n秒
+ * @param n
+ */
+const sleep = (n: number): Promise<void> => {
+    if (n < 0) {
+        n = 1;
+    }
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve()
+        }, n * 1000);
+    })
+}
+
 export default {
-    buildColumnStyle
+    buildColumnStyle,
+    sleep
 }

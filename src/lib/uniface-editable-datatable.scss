@@ -4,12 +4,14 @@
 
 .uniface-editable-data-table {
   position: relative;
+  box-sizing: border-box;
   width: 100%;
   height: 100%;
-  box-sizing: border-box;
-  color: var(--uniface-default-text-color, #374151);
-  background: var(--uniface-data-table-bg, #ffffff);
   overflow: hidden;
+  background-color: var(--uniface-data-table-bg, #ffffff);
+  color: var(--uniface-default-text-color, #374151);
+  display: flex;
+  flex-direction: row;
 
   ::-webkit-scrollbar {
     -webkit-appearance: none;
@@ -18,227 +20,303 @@
     height: 8px;
 
     &:vertical {
-      border-left: 1px solid var(--uniface-inner-border-color, #d9d9d9);
+      border-left: 1px solid var(--uniface-data-table-inline-border-color, #e1e1e180);
     }
 
     &:horizontal {
-      border-top: 1px solid var(--uniface-inner-border-color, #d9d9d9);
+      border-top: 1px solid var(--uniface-data-table-inline-border-color, #e1e1e180);
     }
   }
 
   ::-webkit-scrollbar-thumb {
     border-radius: 4px;
-    background-color: #e1e1e1;
+    background-color: var(--uniface-scroll-color, #e1e1e180);
     -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
   }
 
-  /*
-   * 整个表格分成两个区域，左边的固定区域和右边的数据区域
-   */
-  & > div {
-    width: 100%;
-    height: 100%;
+  //整个表格区域，分3列，左边为指示列和固定列，右边为操作列，中间为数据区
+
+  .vertical-center {
     position: relative;
-    display: flex;
-    flex-direction: row;
+    top: 50%;
+    transform: translateY(-50%);
   }
 
-  .table-row {
-    height: 38px;
+  .header-row {
+    flex: 0 0 auto;
+    width: 100%;
+    position: relative;
+    height: var(--uniface-data-table-header-hight, 48px);
+    font-weight: 600;
+    user-select: none;
+    background-color: var(--uniface-data-table-header-bg, #F8FAFC);
+    border-bottom: 1px solid transparent;
+    color: var(--uniface-data-table-header-color, #374151);
     display: flex;
     flex-direction: row;
-    align-items: center;
-    box-sizing: border-box;
+
+    .header-cell-divider {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 3px;
+      z-index: 2;
+
+      &::before {
+        content: ''; /* 必须指定伪元素的内容 */
+        position: absolute;
+        left: 50%; /* 将伪元素水平居中 */
+        top: 25%;
+        bottom: 25%;
+        width: 1px; /* 竖线宽度 */
+        background-color: var(--uniface-data-table-header-separator-color, #6B7280);; /* 竖线颜色 */
+        transform: translateX(-50%); /* 精确居中 */
+      }
+
+      &.resizer {
+        cursor: col-resize;
+      }
+    }
+  }
+
+  &.cell-border {
+    .header-cell-divider:not(.resizer) {
+      &::before {
+        display: none;
+      }
+    }
+  }
+
+  //表格有内部的横线
+  &.row-border {
+    .header-row, .data-row {
+      border-bottom: 1px solid var(--uniface-data-table-inline-border-color, #CBD5E1);
+    }
+  }
+
+  //表格有内部的竖线
+  &.cell-border {
+    .data-cell {
+      border-right-color: var(--uniface-data-table-inline-border-color, #CBD5E1);
+    }
+  }
+
+
+  //所有的单元格
+  .data-cell {
+    height: 100%;
+    border-right: 1px solid transparent;
+    padding: var(--uniface-data-table-cell-padding, 3px 4px);
     position: relative;
+
+    &:last-child {
+      border-right: none;
+    }
+
+    & > div:first-child {
+      overflow: hidden;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    &.editor {
+      padding: 0;
+      border-bottom: 1px solid transparent;
+    }
+
+    &.active {
+      border-bottom: 1px solid blue;
+    }
+
+    .warning-flag {
+      position: absolute;
+      right: 2px;
+      top: 2px;
+      color: #FF3e00;
+      cursor: help;
+    }
+  }
+
+  //数据行
+  .data-row {
+    position: relative;
+    display: flex;
+    width: 100%;
     flex-wrap: nowrap;
-    background-color: var(--uniface-data-table-bg, #ffffff);
+    flex-direction: row;
+    align-items: center;
+
+    background-color: var(--uniface-data-table-background-color, #ffffff);
 
     &.alternative {
       background-color: var(--uniface-data-table-alter-row-bg, #f7f7f7);
     }
   }
 
-  .indicator-panel {
+  .rows-container {
+    flex: 1 1 auto;
     height: 100%;
-    width: 90px;
+    width: 100%;
     box-sizing: border-box;
+    overflow: hidden;
+
+    & > div {
+      width: 100%;
+      position: relative;
+    }
+  }
+
+  .left-fixed-panel, .action-panel {
+    flex: 0 0 auto;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    flex: 0 0 auto;
 
-    .header-row {
-      box-sizing: border-box;
-      border-right: 1px solid var(--uniface-editor-table-inside-border-color, #e1e1e1);
-    }
-
-    .indicator-header {
+    .bottom-mask-overlay {
       flex: 0 0 auto;
-      overflow: hidden;
-
-    }
-
-    .indicator-rows-wrapper {
-      flex: 1 1 auto;
-      overflow: hidden;
-
-      & > div {
-        width: 100%;
-        position: relative;
-        box-sizing: border-box;
-      }
-    }
-
-    .table-row {
-
-      border-right: 1px solid var(--uniface-editor-table-inside-border-color, #e1e1e1);
-      gap: 6px;
-      padding: 0 8px;
-
-      .action-icon {
-        visibility: hidden;
-        padding: 4px;
-        color: #FFFFFF;
-        background-color: var(--uniface-navigator-menu-hover-background-color, #90CAF9);
-        border-radius: 4px;
-
-        &:active {
-          position: relative;
-          top: 1px;
-        }
-      }
-
-      &:hover {
-        .action-icon {
-          visibility: visible;
-        }
-      }
-    }
-
-    .bottom-mask {
       width: 100%;
       height: 8px;
       box-sizing: border-box;
-      background-color: #ffffff;
-      border-top: 1px solid var(--uniface-inner-border-color, #d9d9d9);
-
+      background-color: var(--uniface-data-table-bg, #ffffff);
+      border-top: 1px solid var(--uniface-data-table-inline-border-color, #e1e1e180);
     }
   }
 
-  .header-row {
-    position: relative;
-    width: 100%;
-    background-color: var(--uniface-data-table-header-bg, #F8FAFC);
-    flex: 0 0 auto;
-    height: var(--uniface-data-table-header-hight, 48px);
-    overflow: hidden;
-    font-weight: 600;
-    user-select: none;
-    color: var(--uniface-data-table-header-color, #374151);
+  .left-fixed-panel {
+    .data-cell {
+      flex: 0 0 auto;
 
-    .resizer {
-      width: 5px;
-      position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      background-repeat: no-repeat;
-      background-position-y: center;
-      background-position-x: right;
-      cursor: ew-resize;
-      background-size: contain;
-      display: none;
+      &:last-child {
+        border-right: none;
+      }
     }
 
+    z-index: 1;
+    border-right: 1px solid var(--uniface-data-table-inline-border-color, #e1e1e180);
+    box-shadow: var(--uniface-data-table-separator-shadow, rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px);
 
-
-    //可滚动的数据列
-    .cells-wrapper {
+    .indicator-cell {
       display: flex;
-      height: 100%;
-      flex-wrap: nowrap;
       flex-direction: row;
-      position: relative;
-      box-sizing: border-box;
+      justify-content: center;
       align-items: center;
-
-      .header-cell {
-        height: 100%;
-        flex: 0 0 auto;
-        position: relative;
-        box-sizing: border-box;
-        border-right: 1px solid var(--uniface-primary-border-color, #E2E8F0);
-
-        &>div:first-child {
-          position: relative;
-          top: 50%;
-          transform: translateY(-50%);
-          text-align: center;
-        }
-
-        &:hover {
-          .resizer {
-            display: block;
-          }
-        }
-
-      }
-
-      &.resizing {
-
-      }
     }
 
   }
 
-  //内容区域，也是分为3个部分
+  .action-panel {
+
+    z-index: 1;
+    border-left: 1px solid var(--uniface-data-table-inline-border-color, #e1e1e180);
+    box-shadow: var(--uniface-data-table-separator-shadow, rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px);
+
+    .header-row {
+      display: block;
+      text-align: center;
+    }
+
+    .data-row {
+      .action-cell {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        align-items: center;
+        width: max-content;
+        height: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        position: relative;
+      }
+    }
+  }
+
+
+  &.row-border {
+    .table-row {
+      border-bottom: 1px solid var(--uniface-data-table-row-border-color, #f0f0f0);
+    }
+  }
+
+  .editor-cell {
+    height: 100%;
+    position: relative;
+  }
+
   .data-content-panel {
     position: relative;
     width: 100%;
     flex: 1 1 auto;
     overflow: hidden;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+
+    .data-cell {
+      flex: 0 0 auto;
+
+      & > div:first-child {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+    }
+
+    .header-row {
+      & > div {
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .data-cell {
+        text-align: center !important;
+      }
+    }
 
     .data-view-panel {
       flex: 1 1 auto;
-      overflow: auto;
+      overflow-y: hidden;
+      overflow-x: scroll;
       position: relative;
-      display: flex;
-      flex-direction: column;
-    }
+      box-sizing: border-box;
 
-    .table-row {
-      .data-cell {
+      & > div {
         position: relative;
-        flex: 0 0 auto;
-        height: 100%;
-        box-sizing: border-box;
-        border-right: 1px solid var(--uniface-editor-table-inside-border-color, #e1e1e1);
-
-        &.active {
-          border: 1px solid blue; /* 获取焦点时的边框 */
-        }
-
-        &:focus {
-          outline: none; /* 可选：移除默认的 outline */
-        }
-
       }
 
-      .editor-cell {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-      }
     }
   }
 
-  .bottom-border {
-    .table-row {
-      &:last-child {
-        border-bottom: 1px solid var(--uniface-editor-table-inside-border-color, #e1e1e1);
-      }
+  .empty-content-board {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    & > div {
+      text-align: center;
+      font-size: 1.5em;
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #7f7f7f;
+      font-style: italic
     }
+  }
+
+
+  &.col-divide-line {
+    .table-data-cell {
+      border-right: 1px solid #e1e1e1;
+    }
+  }
+
+  .uniface-hint-message {
+    color: var(--uniface-form-field-invalid-message-color);
+    font-style: italic;
+    font-size: 0.9em;
   }
 }
