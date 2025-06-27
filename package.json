@@ -1,6 +1,6 @@
 {
   "name": "@ticatec/uniface-editable-data-table",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "A customizable editable table component for Svelte supporting text, number, date, dropdown, and user-defined column types.",
   "main": "index.js",
   "scripts": {
@@ -77,6 +77,14 @@
     "typescript": "^5.7.3",
     "vite": "^5.4.11"
   },
+  "repository": {
+    "type": "https",
+    "url": "https://github.com/ticatec/editable-data-table.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ticatec/editable-data-table/issues"
+  },
+  "homepage": "https://github.com/ticatec/editable-data-table",
   "author": "Henry Feng",
   "license": "MIT",
   "private": false
