@@ -24,7 +24,7 @@
     $: selectable = indicatorColumn?.selectable == true;
 
     const handleToggleSelectAll = async (value: boolean) => {
-        selectedRows = value ? $rows.map(item => item.data) : [];
+        selectedRows = value ? [...$rows] : [];
         await tick();
         selectionMode = value ? SelectionMode.All : SelectionMode.None;
         rows.invalid();
@@ -32,7 +32,7 @@
 
     const handleRowSelectChange = async (row: RowData, value: boolean) => {
         if (value) {
-            if (selectedRows.indexOf(row.data) < 0) {
+            if (selectedRows.indexOf(row) < 0) {
                 selectedRows = [...selectedRows, row];
             }
         } else {
@@ -52,7 +52,7 @@
     <div class="rows-container">
         <div style="top: {-scrollTop}px">
             {#each $rows as row, idx (row.id)}
-                <FixedRow rowNo={idx+1} {row} selected={selectedRows.indexOf(row.data) > -1} alternative={idx % 2 == 1} {selectable}
+                <FixedRow rowNo={idx+1} {row} selected={selectedRows.indexOf(row) > -1} alternative={idx % 2 == 1} {selectable}
                            {rowHeight} {handleRowSelectChange} {indicatorColumn}/>
 
             {/each}

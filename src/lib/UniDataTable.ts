@@ -1,7 +1,5 @@
 import type DataColumn from "./lib/DataColumn";
 
-import {getI18nText} from "@ticatec/i18n";
-import i18nKeys from "$lib/i18nKeys";
 import type RowData from "$lib/lib/RowData";
 
 
@@ -9,6 +7,7 @@ export type RowEventHandler = (row: RowData) => void;
 export type RowSelectEventHandler = (row: RowData, value: boolean) => void;
 export type TableEventHandler = () => void;
 export type SelectionEventHandler = (value: boolean) => void;
+export type DeleteConfirm = (data: any) => Promise<boolean>;
 
 export enum SelectionMode {
     All = 1,
@@ -21,11 +20,9 @@ export default class UniDataTable {
     private _columns: Array<DataColumn> = [];
     readonly id: string;
     private _width: number = 0;
-    private _errorColWidth: number;
 
-    constructor(id: string, errorColWidth: number) {
+    constructor(id: string) {
         this.id = id;
-        this._errorColWidth = errorColWidth;
     }
 
     setColumns(columns: Array<DataColumn>) {

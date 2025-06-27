@@ -3,25 +3,21 @@
     import type DataColumn from "../lib/DataColumn";
     import {onDestroy, onMount} from "svelte";
     import TableHeaderPanel from "./TableHeaderPanel.svelte";
-    import  {type TableEventHandler} from "../UniDataTable";
+    import {type TableEventHandler} from "../UniDataTable";
     import DataRow from "./DataRow.svelte";
     import {rows} from "$lib/lib/RowsStore";
 
 
     export let columns: Array<DataColumn>;
-    export let emptyIndicator: string | null = null;
-
-    //let width: number = 0;
-
     export let scrollTop: number = 0;
     export let rowHeight: number;
     export let activeCell: any;
     export let showVerticalScroll: boolean = false;
     export let displayHorizontalScroll: boolean = true;
+    export let tabWidth: number;
 
     export let handleWidthChange: TableEventHandler;
 
-    export let tabWidth: number;
 
     let scrollLeft: number = 0;
 
@@ -31,12 +27,12 @@
     onMount(async () => {
         resizeObserver = new ResizeObserver(() => {
             // 每次 div 尺寸变化时，更新 clientWidth
-            viewWidth = Math.round(viewPanel?.clientWidth)-1;
+            viewWidth = Math.round(viewPanel?.clientWidth) - 1;
         });
         resizeObserver.observe(viewPanel);
     });
 
-    onDestroy(()=>{
+    onDestroy(() => {
         resizeObserver.disconnect();
     })
 
@@ -85,16 +81,10 @@
     <TableHeaderPanel dataCols={columns} {scrollLeft} width={tabWidth} {hasWhitespace} {handleWidthChange}/>
     <div class="data-view-panel" bind:this={dataPanel} on:scroll|passive={handleDataTableScroll} on:wheel|passive={handleWheelEvent}
          style="overflow-x: {displayHorizontalScroll ? 'scroll' : 'auto'}; overflow-y: {showVerticalScroll ?'auto': 'hidden' };">
-        {#if $rows.length > 0}
-            <div style="box-sizing: border-box; width: {rowWidth}px; top: {top}">
-                {#each $rows as row, idx}
-                    <DataRow {rowHeight} {row} {columns} rowIdx={idx} alternative={idx % 2 == 1} bind:activeCell/>
-                {/each}
-            </div>
-        {:else}
-            <div class="empty-content-board" style="width: 100%">
-                <div>{emptyIndicator ?? "Empty dataset."}</div>
-            </div>
-        {/if}
+        <div style="box-sizing: border-box; width: {rowWidth}px; top: {top}">
+            {#each $rows as row, idx (row.id)}
+                <DataRow {rowHeight} {row} {columns} rowIdx={idx} alternative={idx % 2 == 1} bind:activeCell/>
+            {/each}
+        </div>
     </div>
 </div>

@@ -1,6 +1,7 @@
 import {utils} from "@ticatec/enhanced-utils";
 import type BaseValidator from "@ticatec/web-bean-validator/lib/BaseValidator";
 import beanValidator from "@ticatec/web-bean-validator";
+import tableUtils from "../lib/TableUtils";
 
 export default class RowData {
     id: any;
@@ -10,7 +11,7 @@ export default class RowData {
 
     constructor(data: any) {
         this.data = utils.clone(data);
-        this.id = ((new Date()).getTime() * 10000 + Math.floor(Math.random() * 10000)).toString(36).concat((Math.floor(Math.random() * 10000)).toString(36))
+        this.id = tableUtils.genId()
     }
 
     validate(rules: Array<BaseValidator>) {

@@ -1,7 +1,7 @@
 const i18nKeys = {
-    errorTitle: {
-        key: "aoss.editableTable.errorTitle",
-        text: "error"
+    btnDelete: {
+        key: "aoss.editableTable.btnDelete",
+        text: "Delete"
     }
 }
 

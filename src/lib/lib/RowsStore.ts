@@ -18,13 +18,14 @@ function createRowsStore(initial: Array<any> = []) {
         // 删除指定索引的元素
         remove: (...rows: Array<RowData>) => {
             update((current: Array<any>) => {
+                let newArray = [...current];
                 for (let row of rows) {
-                    let index = current.findIndex(item => item == row);
+                    const index = newArray.findIndex(item => item.id === row.id);
                     if (index > -1) {
-                        current.splice(index, 1);
+                        newArray.splice(index, 1);
                     }
                 }
-                return [...current]
+                return newArray;
             });
         },
         invalid: () => {

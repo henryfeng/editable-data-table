@@ -13,14 +13,17 @@
     import columns from "./columns";
     import type IndicatorColumn from "$lib/lib/IndicatorColumn";
     import i18n from "@ticatec/i18n";
-    import type {ActionsColumn, RowAction} from "@ticatec/uniface-element/DataTable";
+    import {DialogBoard} from "@ticatec/uniface-element/Dialog";
+    import MessageBoxBoard, {ModalResult} from "@ticatec/uniface-element/MessageBox";
+    import ToastBoard from "@ticatec/uniface-element/Toast";
+    import IndicatorBoard from "@ticatec/uniface-element/IndicatorBoard";
     import type RowData from "$lib/lib/RowData";
     import {StringValidator} from "@ticatec/web-bean-validator";
 
     i18n.languages = ['en', 'zh-CN'];
     i18n.setResource(cn_resource);
 
-    let list: Array<any> = [
+    let list1: Array<any> = [
         {address: "8 crofton close, wonga park."},
         {},
         {},
@@ -41,7 +44,8 @@
         {},
         {},
         {}
-    ]
+    ];
+    let list = [...list1, ...list1, ...list1, ...list1, ...list1]
 
     let indicatorColumn: IndicatorColumn = {
         selectable: true,
@@ -49,22 +53,10 @@
         width: 60
     }
 
-    const removeItem = (row: RowData) => {
-        console.log('删除数据', row);
-        table.removeRows(row);
+    const deleteConfirm = async (data: any): Promise<boolean> => {
+        return await window.MessageBox.showConfirm('确定要删除这条数据吗？') == ModalResult.MR_OK;
     }
 
-    let actions: RowAction = {
-        label: '删除',
-        callback: removeItem
-    }
-
-    let actionsColumn: ActionsColumn = {
-        getActions: (data: any) => {
-            return [actions]
-        },
-        width: 90
-    }
 
     const removeSelectedRows = () => {
         console.log('删除选中行');
@@ -85,7 +77,7 @@
         console.log('当前数据', table.getData());
         table.validateData(rules);
     }
-
+//    {deleteConfirm}
     $: console.log('选中数据：', selectedRows);
 
 </script>
@@ -94,12 +86,16 @@
     <TextEditor variant="plain" value="234234234" style="width: 120px"/>
 
     <Box style="height: 600px; width: 90%">
-        <EditorDataTable bind:this={table} {list} {columns} {indicatorColumn} bind:selectedRows {actionsColumn}/>
+        <EditorDataTable bind:this={table} {list} {columns} {indicatorColumn} bind:selectedRows allowDelete />
     </Box>
     <Button type="primary" label="批量删除" onClick={removeSelectedRows}/>
     <Button type="primary" label="数据检查" onClick={validate}/>
 </div>
+<DialogBoard/>
+<MessageBoxBoard/>
 <PopupHint/>
+<ToastBoard/>
+<IndicatorBoard/>
 
 
 
