@@ -5,35 +5,64 @@
     import type {ActionsColumn, RowAction} from "@ticatec/uniface-element/DataTable";
     import type IndicatorColumn from "./lib/IndicatorColumn";
     import UniDataTable, {type DeleteConfirm} from "./UniDataTable";
-    import {onMount} from "svelte";
+    import {onDestroy, onMount} from "svelte";
     import FixedColumnsPanel from "./parts/FixedColumnsPanel.svelte";
     import ActionsPanel from "./parts/ActionsPanel.svelte";
-    import {rows} from "$lib/lib/RowsStore";
+
     import type RowData from "$lib/lib/RowData";
     import type BaseValidator from "@ticatec/web-bean-validator/lib/BaseValidator";
     import {getI18nText} from "@ticatec/i18n";
     import i18nKeys from "$lib/i18nKeys";
+    import {createRowsStore} from "$lib/lib/RowsStore";
 
 
     export let columns: Array<DataColumn>;
     export let indicatorColumn: IndicatorColumn | null = null;
     export let rowHeight: number = 40;
-    export let list: Array<any>;
-    export let selectedRows: Array<any> = [];
     export let allowDelete: boolean = true;
     export let deleteConfirm: DeleteConfirm = null as unknown as DeleteConfirm;
-
+    export let selectedCount: number = 0;
 
     export let style: string = '';
 
+    let rows:any = createRowsStore();
+    let unsubscribe:any;
+
+
+    let selectedRows: Array<any> = [];
+
+    $: selectedCount = selectedRows.length;
+
+    /**
+     * 获取表格数据
+     */
     export const getData = () => {
         return $rows.map((item: RowData) => item.data);
     }
 
-    export const removeRows = (...items: Array<RowData>) => {
-        activeCell = null;
-        rows.remove(...items);
+    /**
+     * 新增数据行
+     * @param items
+     */
+    export const appendRows = (items: any) => {
+        let arr: Array<any> = Array.isArray(items) ? items : [items];
+        console.log('添加数据', arr);
+        rows.push(arr);
+        console.log('表格数据', $rows)
     }
+
+    /**
+     * 删除选中的行
+     */
+    export const deleteSelectedRows = () => {
+        activeCell = null;
+        rows.remove(...selectedRows);
+        selectedRows = [];
+    }
+    /**
+     * 校验表格数据
+     * @param rules
+     */
     export const validateData = (rules: Array<BaseValidator>) => {
         for (let row of $rows) {
             row.validate(rules);
@@ -47,7 +76,9 @@
     const removeRow = async (row: RowData) => {
         let confirmed = deleteConfirm ? await deleteConfirm(row.data) : true;
         if (confirmed) {
-            removeRows(row);
+            activeCell = null;
+            rows.remove(row);
+
         }
     }
 
@@ -72,11 +103,23 @@
     let init: boolean = false;
 
     onMount(() => {
+        unsubscribe = rows.subscribe((value: any) => {
+        });
         table = new UniDataTable(id);
         selectedRows = selectedRows ?? [];
         initializeTable();
         init = true;
     })
+
+
+    onDestroy(() => {
+        rows.clear(); // 清空数据
+        if (unsubscribe) {
+            unsubscribe(); // 取消订阅
+        }
+        rows = null; // 释放 store 引用
+    });
+
 
     let scrollTop: number;
     let activeCell: any;
@@ -102,25 +145,22 @@
 
     $: rowHeight = rowHeight ?? 40;
 
-    $: rows.set(list);
-
-
 </script>
 
 <div id="tab-{id}" {style} class="uniface-editable-data-table cell-border row-border">
     {@html tabStyle}
     {#if table && dataColumns}
         {#if indicatorColumn}
-            <FixedColumnsPanel bind:selectedRows {indicatorColumn} {rowHeight} bind:scrollTop/>
+            <FixedColumnsPanel {rows} bind:selectedRows {indicatorColumn} {rowHeight} bind:scrollTop/>
         {/if}
 
-        <ContentPanel columns={dataColumns} {handleWidthChange} {tabWidth} bind:activeCell
+        <ContentPanel {rows} columns={dataColumns} {handleWidthChange} {tabWidth} bind:activeCell
                       bind:scrollTop {rowHeight}
                       displayHorizontalScroll={actionsColumn!=null || indicatorColumn != null }
                       showVerticalScroll={actionsColumn == null}/>
     {/if}
 
     {#if actionsColumn}
-        <ActionsPanel {rowHeight} {actionsColumn} bind:scrollTop/>
+        <ActionsPanel {rows} {rowHeight} {actionsColumn} bind:scrollTop/>
     {/if}
 </div>

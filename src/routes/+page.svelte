@@ -19,6 +19,7 @@
     import IndicatorBoard from "@ticatec/uniface-element/IndicatorBoard";
     import type RowData from "$lib/lib/RowData";
     import {StringValidator} from "@ticatec/web-bean-validator";
+    import {onMount} from "svelte";
 
     i18n.languages = ['en', 'zh-CN'];
     i18n.setResource(cn_resource);
@@ -57,15 +58,10 @@
         return await window.MessageBox.showConfirm('确定要删除这条数据吗？') == ModalResult.MR_OK;
     }
 
-
-    const removeSelectedRows = () => {
-        console.log('删除选中行');
-        if (selectedRows.length > 0) {
-            table.removeRows(...selectedRows)
-        }
+    const batchDeleteConfirm = async (): Promise<boolean> => {
+        return await window.MessageBox.showConfirm('确定要删除所有选中的数据吗？') == ModalResult.MR_OK;
     }
 
-    let selectedRows: Array<any>;
 
     let table: any;
 
@@ -77,8 +73,18 @@
         console.log('当前数据', table.getData());
         table.validateData(rules);
     }
-//    {deleteConfirm}
-    $: console.log('选中数据：', selectedRows);
+
+    let selectedCount: number;
+    //    {deleteConfirm}
+    $: console.log('选中数据：', selectedCount);
+
+    onMount(() => {
+
+    })
+
+    $: if (table) {
+        table.appendRows(list);
+    }
 
 </script>
 
@@ -86,9 +92,10 @@
     <TextEditor variant="plain" value="234234234" style="width: 120px"/>
 
     <Box style="height: 600px; width: 90%">
-        <EditorDataTable bind:this={table} {list} {columns} {indicatorColumn} bind:selectedRows allowDelete />
+        <EditorDataTable bind:this={table} {columns} {indicatorColumn} bind:selectedCount allowDelete {deleteConfirm}/>
     </Box>
-    <Button type="primary" label="批量删除" onClick={removeSelectedRows}/>
+    <Button type="primary" label="批量删除" disabled={selectedCount==0}
+            onClick={async ()=>{ if (await batchDeleteConfirm()) { table.deleteSelectedRows()}}}/>
     <Button type="primary" label="数据检查" onClick={validate}/>
 </div>
 <DialogBoard/>

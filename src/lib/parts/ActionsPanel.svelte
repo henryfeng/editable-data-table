@@ -4,12 +4,11 @@
     import {onDestroy, onMount} from "svelte";
     import i18n from "@ticatec/i18n";
     import type {ActionsColumn} from "@ticatec/uniface-element/DataTable";
-    import {rows} from "$lib/lib/RowsStore";
 
     export let actionsColumn: ActionsColumn;
     export let scrollTop: number = 0;
-
     export let rowHeight: number;
+    export let rows: any;
 
     const handleActionPanelScroll = (e: Event) => {
         scrollTop = e.target?.scrollTop;

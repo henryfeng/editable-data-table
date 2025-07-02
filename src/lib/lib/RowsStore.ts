@@ -2,8 +2,8 @@ import {writable} from 'svelte/store';
 import RowData from "$lib/lib/RowData";
 
 
-function createRowsStore(initial: Array<any> = []) {
-    const {subscribe, set, update} = writable(initial.map(item => new RowData(item)));
+export function createRowsStore() {
+    const {subscribe, set, update} = writable([].map(item => new RowData(item)));
 
     return {
         subscribe,
@@ -12,8 +12,8 @@ function createRowsStore(initial: Array<any> = []) {
             set(newArray.map(item => new RowData(item))); // 始终创建新数组以触发更新
         },
         // 添加元素
-        push: (...items: Array<any>) => {
-            update((current: Array<any>) => [...current, items.map(item => new RowData(item))]);
+        push: (items: Array<any>) => {
+            update((current: Array<any>) => [...current, ...items.map(item => new RowData(item))]);
         },
         // 删除指定索引的元素
         remove: (...rows: Array<RowData>) => {
@@ -48,5 +48,4 @@ function createRowsStore(initial: Array<any> = []) {
     };
 }
 
-export const rows = createRowsStore([]);
 

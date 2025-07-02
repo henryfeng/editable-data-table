@@ -5,7 +5,7 @@
     import TableHeaderPanel from "./TableHeaderPanel.svelte";
     import {type TableEventHandler} from "../UniDataTable";
     import DataRow from "./DataRow.svelte";
-    import {rows} from "$lib/lib/RowsStore";
+
 
 
     export let columns: Array<DataColumn>;
@@ -15,6 +15,7 @@
     export let showVerticalScroll: boolean = false;
     export let displayHorizontalScroll: boolean = true;
     export let tabWidth: number;
+    export let rows: any;
 
     export let handleWidthChange: TableEventHandler;
 

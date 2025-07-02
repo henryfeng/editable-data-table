@@ -7,10 +7,11 @@
     import FixedHeaderPanel from "./FixedHeaderPanel.svelte";
     import FixedRow from "./FixedRow.svelte";
     import type RowData from "$lib/lib/RowData";
-    import {rows} from "$lib/lib/RowsStore";
+
 
     export let indicatorColumn: IndicatorColumn | null;
     export let scrollTop: number = 0;
+    export let rows: any;
 
     let selectionMode: SelectionMode = SelectionMode.None;
 

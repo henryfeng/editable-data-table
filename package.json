@@ -1,6 +1,6 @@
 {
   "name": "@ticatec/uniface-editable-data-table",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "description": "A customizable editable table component for Svelte supporting text, number, date, dropdown, and user-defined column types.",
   "main": "index.js",
   "scripts": {
