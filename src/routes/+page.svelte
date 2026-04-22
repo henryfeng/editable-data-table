@@ -85,6 +85,7 @@
     $: if (table) {
         table.appendRows(list);
     }
+    let table2: any;
 
 </script>
 
@@ -93,6 +94,9 @@
 
     <Box style="height: 600px; width: 90%">
         <EditorDataTable bind:this={table} {columns} {indicatorColumn} bind:selectedCount allowDelete {deleteConfirm}/>
+    </Box>
+    <Box style="height: 300px; width: 90%">
+        <EditorDataTable bind:this={table2} {columns} {indicatorColumn} bind:selectedCount allowDelete {deleteConfirm}/>
     </Box>
     <Button type="primary" label="批量删除" disabled={selectedCount==0}
             onClick={async ()=>{ if (await batchDeleteConfirm()) { table.deleteSelectedRows()}}}/>

@@ -84,6 +84,7 @@
   border-right: 1px solid transparent;
   padding: var(--uniface-data-table-cell-padding, 3px 4px);
   position: relative;
+  overflow: hidden;
 }
 .uniface-editable-data-table .data-cell:last-child {
   border-right: none;

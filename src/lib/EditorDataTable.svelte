@@ -11,9 +11,8 @@
 
     import type RowData from "$lib/lib/RowData";
     import type BaseValidator from "@ticatec/web-bean-validator/lib/BaseValidator";
-    import {getI18nText} from "@ticatec/i18n";
-    import i18nKeys from "$lib/i18nKeys";
     import {createRowsStore} from "$lib/lib/RowsStore";
+    import i18nRes from "$lib/i18nRes";
 
 
     export let columns: Array<DataColumn>;
@@ -22,6 +21,7 @@
     export let allowDelete: boolean = true;
     export let deleteConfirm: DeleteConfirm = null as unknown as DeleteConfirm;
     export let selectedCount: number = 0;
+    export let count: number = 0;
 
     export let style: string = '';
 
@@ -36,7 +36,7 @@
     /**
      * 获取表格数据
      */
-    export const getData = () => {
+    export const getData = ():Array<any> => {
         return $rows.map((item: RowData) => item.data);
     }
 
@@ -46,9 +46,7 @@
      */
     export const appendRows = (items: any) => {
         let arr: Array<any> = Array.isArray(items) ? items : [items];
-        console.log('添加数据', arr);
         rows.push(arr);
-        console.log('表格数据', $rows)
     }
 
     /**
@@ -83,7 +81,7 @@
     }
 
     let actions: RowAction = {
-        label: getI18nText(i18nKeys.btnDelete),
+        label: i18nRes.common.btnDelete,
         callback: removeRow
     }
 
@@ -103,7 +101,8 @@
     let init: boolean = false;
 
     onMount(() => {
-        unsubscribe = rows.subscribe((value: any) => {
+        unsubscribe = rows.subscribe((arr: Array<any>) => {
+            count = arr.length;
         });
         table = new UniDataTable(id);
         selectedRows = selectedRows ?? [];
@@ -114,9 +113,7 @@
 
     onDestroy(() => {
         rows.clear(); // 清空数据
-        if (unsubscribe) {
-            unsubscribe(); // 取消订阅
-        }
+        unsubscribe?.(); // 取消订阅
         rows = null; // 释放 store 引用
     });
 

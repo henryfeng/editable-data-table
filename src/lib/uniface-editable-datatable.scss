@@ -109,6 +109,7 @@
     border-right: 1px solid transparent;
     padding: var(--uniface-data-table-cell-padding, 3px 4px);
     position: relative;
+    overflow: hidden;
 
     &:last-child {
       border-right: none;
